@@ -1,13 +1,17 @@
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 /**
+ * model of a percolation system including WeightedQuickUnionUF from algs4.jar
+ * keeps virtual nodes above the first row and below the last row 
+ * to check percolation, it just checks if the two virtual nodes are connected
  * 
  * @author egunay
  *
  */
 public class Percolation {
 	
-	private WeightedQuickUnionUF weightedQuickUnionUF;
+	private WeightedQuickUnionUF uf;
+	
 	private int n;
 	private boolean[] siteStates;
 	private int openSiteCount;
@@ -25,16 +29,18 @@ public class Percolation {
 		this.n = n;
 		this.topLineIndex = N;
 		this.bottomLineIndex = N + 1;
-		weightedQuickUnionUF = new WeightedQuickUnionUF(N + 2);
+		
+		uf = new WeightedQuickUnionUF(N + 2);
+		
 		siteStates = new boolean[N];
 		
 		// link the top line to virtual node
 		for (int i = 0; i < n; i++) 
-			weightedQuickUnionUF.union(topLineIndex, i);
+			uf.union(topLineIndex, i);
 		
 		// link the bottom line to virtual node
 		for (int i = N - n -1; i < N; i++)
-			weightedQuickUnionUF.union(bottomLineIndex, i);
+			uf.union(bottomLineIndex, i);
 	}
 
 	// open site (row, col) if it is not open already
@@ -52,7 +58,7 @@ public class Percolation {
 				continue;
 			
 			if (siteStates[q]) {
-				weightedQuickUnionUF.union(p, q);
+				uf.union(p, q);
 			}
 		}
 		
@@ -66,7 +72,7 @@ public class Percolation {
 	// is site (row, col) full?
 	public boolean isFull(int row, int col) {
 		int p = getIndex(row, col);
-		return siteStates[p] && weightedQuickUnionUF.connected(topLineIndex, p);
+		return siteStates[p] && uf.connected(topLineIndex, p);
 	}
 
 	// number of open sites
@@ -76,7 +82,7 @@ public class Percolation {
 
 	// does the system percolate?
 	public boolean percolates() {
-		return weightedQuickUnionUF.connected(topLineIndex, bottomLineIndex);
+		return uf.connected(topLineIndex, bottomLineIndex);
 	}
 
 	private int getIndex(int row, int col) {
